@@ -1,34 +1,36 @@
-# context-sync
+# sync-ai-context
+
+[![CI](https://github.com/KiritoKing/sync-ai-context/actions/workflows/ci.yml/badge.svg)](https://github.com/KiritoKing/sync-ai-context/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/sync-ai-context.svg)](https://www.npmjs.com/package/sync-ai-context)
+[![npm downloads](https://img.shields.io/npm/dm/sync-ai-context.svg)](https://www.npmjs.com/package/sync-ai-context)
+[![License](https://img.shields.io/github/license/KiritoKing/sync-ai-context.svg)](./LICENSE)
+[![Provenance](https://github.com/KiritoKing/sync-ai-context/actions/workflows/release.yml/badge.svg)](https://github.com/KiritoKing/sync-ai-context/actions/workflows/release.yml)
 
 Config-driven context sync for AI tools with a single source of truth.
 
-v1 includes:
-- `source.kind=canonical|tool`
-- target sync with `link` / `copy`
-- integrity checks for link and copy targets
-- `sync`, `check`, `doctor` CLI commands
-- TDD workflow with `rstest`
+中文文档: [README.zh-CN.md](./README.zh-CN.md)
+
+## Features
+
+- `source.kind=canonical|tool` as single source
+- `link` and `copy` target modes
+- `sync`, `check`, `doctor` commands
+- `--dry-run` and `--force` conflict strategy
+- CI-driven npm publish with release/tag automation and provenance
 
 ## Install
 
 ```bash
-pnpm install
+npm install -g sync-ai-context
 ```
 
-## Build
+Or run without global install:
 
 ```bash
-pnpm run build
+npx sync-ai-context sync --dry-run
 ```
 
-## TDD Workflow
-
-```bash
-pnpm run test
-pnpm run check
-```
-
-## Config
+## Quick Start
 
 Create `context-sync.config.json`:
 
@@ -52,24 +54,13 @@ Create `context-sync.config.json`:
 }
 ```
 
-Use `source.kind=canonical` if you want an independent source directory:
+Run sync:
 
-```json
-{
-  "source": {
-    "kind": "canonical",
-    "skillsPath": ".aime/skills"
-  },
-  "targets": {
-    "codex": {
-      "skillsPath": ".agents/skills",
-      "mode": "link"
-    }
-  }
-}
+```bash
+context-sync sync
 ```
 
-## CLI
+## CLI Reference
 
 ```bash
 # sync all targets
@@ -91,50 +82,71 @@ context-sync check
 context-sync doctor
 ```
 
+## Behavior Semantics
+
+### source.kind
+
+- `canonical`: use an independent source directory as the only source.
+- `tool`: use a tool directory directly as the only source.
+
+### target mode
+
+- `link` mode:
+  - ensures target path is a symlink to source path
+  - `check` fails with `symlink mismatch` when link target is wrong
+- `copy` mode:
+  - copies source tree to target path
+  - `check` fails with `copy drift` when `modified/missing/extra` exists
+
+### conflict strategy
+
+- `--dry-run`: preview actions, no filesystem writes
+- `--force`: allow replacing conflicting target state
+
 ## Programmatic API
 
 ```ts
-import { loadConfigFromFile, syncContext, checkContext } from 'context-sync';
+import { checkContext, loadConfigFromFile, syncContext } from 'sync-ai-context';
 
 const config = await loadConfigFromFile(process.cwd());
 await syncContext({ config, dryRun: false, force: false });
 await checkContext({ config });
 ```
 
-## Sync Behavior
+## Development
 
-- `link` mode:
-  - ensures the target is a symlink to the source
-  - `check` fails on symlink mismatch
-- `copy` mode:
-  - copies source tree to target
-  - `check` reports `modified/missing/extra` drift
-- `dry-run` prints planned actions without writing
-- conflicts are blocked by default unless `--force` is used
-
-## CI Example
-
-```yaml
-name: ci
-on:
-  push:
-  pull_request:
-
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run test
-      - run: pnpm run check
-      - run: pnpm run build
-      - run: pnpm exec context-sync check
+```bash
+pnpm install
+pnpm run test
+pnpm run build
+pnpm run check:oss
+pnpm run check:badges
 ```
+
+## Release and Provenance
+
+- Release/tag automation is managed by `.github/workflows/release.yml`.
+- npm publish runs in CI with `--provenance` and OIDC (`id-token: write`).
+- The `Provenance` badge indicates pipeline-backed release execution status.
+
+## Badge Maintenance Policy
+
+- Required badges: `CI`, `npm version`, `npm downloads`, `License`, `Provenance`.
+- CI validates badge presence via `pnpm run check:badges`.
+- If a badge link or data source is invalid, CI should fail before release.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
+## Security
+
+See [SECURITY.md](./SECURITY.md).
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md).
+
+## License
+
+MIT, see [LICENSE](./LICENSE).
