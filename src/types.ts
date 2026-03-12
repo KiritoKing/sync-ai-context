@@ -22,6 +22,7 @@ export interface TargetInput {
 }
 
 export interface ConfigInput {
+  $schema?: string;
   source: SourceInput;
   targets: Record<string, TargetInput>;
 }

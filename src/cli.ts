@@ -1,15 +1,18 @@
 import path from 'node:path';
 import { loadConfigFromFile } from './config';
 import { checkContext, doctorContext, syncContext } from './engine';
+import type { PromptAdapter } from './init';
+import { runInit } from './init';
 
 export interface CliIo {
   cwd?: string;
   stdout?: (line: string) => void;
   stderr?: (line: string) => void;
+  promptAdapter?: PromptAdapter;
 }
 
 interface ParsedArgs {
-  command: 'sync' | 'check' | 'doctor';
+  command: 'sync' | 'check' | 'doctor' | 'init';
   target?: string;
   force: boolean;
   dryRun: boolean;
@@ -21,9 +24,12 @@ function parseArgs(args: string[]): ParsedArgs {
   const command = commandRaw as ParsedArgs['command'];
   if (
     !command ||
-    (command !== 'sync' && command !== 'check' && command !== 'doctor')
+    (command !== 'sync' &&
+      command !== 'check' &&
+      command !== 'doctor' &&
+      command !== 'init')
   ) {
-    throw new Error('Unknown command. Use: sync | check | doctor');
+    throw new Error('Unknown command. Use: sync | check | doctor | init');
   }
   const parsed: ParsedArgs = {
     command,
@@ -73,6 +79,18 @@ export async function runCli(args: string[], io: CliIo = {}): Promise<number> {
     const configPath = path.isAbsolute(parsed.configPath)
       ? parsed.configPath
       : path.join(cwd, parsed.configPath);
+
+    if (parsed.command === 'init') {
+      const result = await runInit({
+        cwd,
+        configPath: parsed.configPath,
+        promptAdapter: io.promptAdapter,
+      });
+      writeLines(stdout, result.actions);
+      writeLines(stderr, result.errors);
+      return result.success ? 0 : 1;
+    }
+
     const config = await loadConfigFromFile(cwd, configPath);
 
     if (parsed.command === 'sync') {

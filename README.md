@@ -34,6 +34,7 @@ Create `context-sync.config.json`:
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json",
   "source": {
     "kind": "tool",
     "tool": "claude",
@@ -56,6 +57,7 @@ Use `source.kind=canonical` if you want an independent source directory:
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json",
   "source": {
     "kind": "canonical",
     "skillsPath": ".aime/skills"
@@ -69,9 +71,33 @@ Use `source.kind=canonical` if you want an independent source directory:
 }
 ```
 
+## Init Command
+
+Use the interactive bootstrap command to generate config in one shot:
+
+```bash
+context-sync init
+```
+
+What `init` provides:
+- choose `source.kind=canonical|tool`
+- select common target tools (multi-select)
+- apply target mode strategy (`preset` / `link` / `copy`)
+- write `$schema` automatically for editor autocomplete and validation
+- protect existing config with overwrite confirmation
+
+You can also set custom config location:
+
+```bash
+context-sync init --config configs/dev-context.json
+```
+
 ## CLI
 
 ```bash
+# interactive config bootstrap
+context-sync init
+
 # sync all targets
 context-sync sync
 
@@ -90,6 +116,17 @@ context-sync check
 # basic health checks
 context-sync doctor
 ```
+
+## JSON Schema
+
+The official schema is committed at:
+- `context-sync.schema.json` (repo root)
+
+Recommended schema URL styles:
+- main branch (always latest):
+  - `https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json`
+- versioned tag (stable for production):
+  - `https://raw.githubusercontent.com/bytedance/vibe-coder-manager/<tag>/context-sync.schema.json`
 
 ## Programmatic API
 

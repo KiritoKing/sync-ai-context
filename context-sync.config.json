@@ -1,12 +1,35 @@
 {
+  "$schema": "https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json",
   "source": {
-    "kind": "canonical",
-    "skillsPath": ".codex/skills"
+    "kind": "tool",
+    "tool": "codex",
+    "skillsPath": ".agents/skills"
   },
   "targets": {
-    "codex": {
-      "skillsPath": ".agents/skills",
+    "claude": {
+      "skillsPath": ".claude/skills",
+      "memoryPath": "CLAUDE.md",
       "mode": "link"
+    },
+    "cursor": {
+      "skillsPath": ".cursor/skills",
+      "memoryPath": ".cursor/rules/project.mdc",
+      "mode": "copy"
+    },
+    "copilot": {
+      "skillsPath": ".github/instructions/skills",
+      "memoryPath": ".github/copilot-instructions.md",
+      "mode": "copy"
+    },
+    "continue": {
+      "skillsPath": ".continue/skills",
+      "memoryPath": ".continue/rules/project.md",
+      "mode": "copy"
+    },
+    "cline": {
+      "skillsPath": ".clinerules/skills",
+      "memoryPath": ".clinerules/project.md",
+      "mode": "copy"
     }
   }
 }

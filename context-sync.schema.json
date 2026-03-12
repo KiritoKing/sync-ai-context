@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json",
+  "title": "context-sync config",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "canonical"
+            },
+            "skillsPath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "memoryPath": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["kind", "skillsPath"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "tool"
+            },
+            "tool": {
+              "type": "string",
+              "minLength": 1
+            },
+            "skillsPath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "memoryPath": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": ["kind", "tool", "skillsPath"]
+        }
+      ]
+    },
+    "targets": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "skillsPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "memoryPath": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mode": {
+            "type": "string",
+            "enum": ["link", "copy"]
+          }
+        },
+        "required": ["skillsPath", "mode"]
+      }
+    }
+  },
+  "required": ["source", "targets"]
+}
