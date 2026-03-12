@@ -1,0 +1,12 @@
+{
+  "source": {
+    "kind": "canonical",
+    "skillsPath": ".codex/skills"
+  },
+  "targets": {
+    "codex": {
+      "skillsPath": ".agents/skills",
+      "mode": "link"
+    }
+  }
+}

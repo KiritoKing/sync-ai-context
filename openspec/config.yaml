@@ -1,0 +1,38 @@
+schema: spec-driven
+context: |
+  技术栈：TypeScript + Node.js，使用 Rslib 构建，Rstest 测试框架。
+  包管理器：pnpm。
+  Node.js 工具命令约定：使用 npx 前缀执行（例如 npx tsc、npx eslint）。
+  目标产品：开源的上下文策略同步工具（rules + skills），支持多工具适配。
+  一期边界：
+  - 必须支持 single-source，同步模式为 link/copy。
+  - 必须支持 source.kind=canonical|tool（可直接以某工具目录为源）。
+  - 必须支持 check、dry-run、force。
+  - 明确不包含云端模板拉取与远程 registry（放到后续阶段）。
+  工程约束：
+  - 修改代码时必须修复 ESLint Error 和 TypeScript Error。
+  - 忽略 ESLint Warning 与纯格式化问题（Prettier）。
+  - 禁止使用 any。
+  - 优先使用 Root-Import（@/）。
+  开发方式：
+  - 采用 TDD（red -> green -> refactor）。
+  - 先写测试用例，再实现功能代码。
+  - 所有测试统一使用 rstest。
+
+rules:
+  proposal:
+    - 必须明确写出一期范围与非目标，尤其是云端拉取不在一期。
+    - Capabilities 必须可映射到可测试规范，不写空泛目标。
+  design:
+    - 必须包含 source.kind=canonical|tool 的设计决策与理由。
+    - 必须说明 link/copy/check 的行为语义与冲突处理策略。
+    - 必须写明测试策略为 rstest + TDD。
+  specs:
+    - 每个需求必须可测试，并至少包含一个场景。
+    - 必须覆盖 link 模式与 copy 模式差异化行为。
+    - 必须覆盖 check 失败条件（至少包含 symlink mismatch 和 copy drift）。
+    - 必须包含测试相关需求（rstest 与测试先行要求）。
+  tasks:
+    - 任务必须先安排测试用例编写，再安排实现任务。
+    - 任务拆分需按可独立验证的小步推进。
+    - 任务中必须包含 rstest 单元测试和端到端测试项。
