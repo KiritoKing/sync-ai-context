@@ -1,9 +1,14 @@
 {
-  "name": "vibe-coder-manager",
-  "version": "1.0.0",
+  "name": "sync-ai-context",
+  "version": "0.0.1",
+  "description": "Config-driven AI context sync tool for rules and skills across coding agents",
   "type": "module",
   "bin": {
     "context-sync": "./dist/bin.js"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
   },
   "exports": {
     ".": {
@@ -34,5 +39,5 @@
     "@types/node": "^24.12.0",
     "typescript": "^5.9.3"
   },
-  "private": true
+  "license": "MIT"
 }
