@@ -2,13 +2,33 @@
   "name": "sync-ai-context",
   "version": "0.0.1",
   "description": "Config-driven AI context sync tool for rules and skills across coding agents",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KiritoKing/sync-ai-context.git"
+  },
+  "homepage": "https://github.com/KiritoKing/sync-ai-context#readme",
+  "bugs": {
+    "url": "https://github.com/KiritoKing/sync-ai-context/issues"
+  },
+  "keywords": [
+    "cli",
+    "context-sync",
+    "ai-tools",
+    "developer-tools",
+    "automation"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "type": "module",
   "bin": {
     "context-sync": "./dist/bin.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
-    "access": "public"
+    "access": "public",
+    "provenance": true
   },
   "exports": {
     ".": {
@@ -25,6 +45,8 @@
   ],
   "scripts": {
     "build": "rslib build",
+    "check:badges": "node scripts/check-readme-badges.mjs",
+    "check:oss": "node scripts/check-open-source.mjs",
     "check": "biome check --write",
     "dev": "rslib build --watch",
     "format": "biome format --write",
@@ -39,7 +61,6 @@
     "@types/node": "^24.12.0",
     "typescript": "^5.9.3"
   },
-  "license": "MIT",
   "dependencies": {
     "@inquirer/prompts": "^8.3.0"
   }
