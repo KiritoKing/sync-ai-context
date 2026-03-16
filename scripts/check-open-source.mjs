@@ -80,7 +80,7 @@ async function main() {
     'release workflow publish job must depend on verify job',
   );
   assert(
-    workflow.includes('softprops/action-gh-release'),
+    workflow.includes('gh release create'),
     'release workflow must create GitHub release',
   );
   assert(
