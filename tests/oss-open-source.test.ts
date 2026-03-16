@@ -81,6 +81,6 @@ describe('release automation workflow', () => {
     expect(workflow.includes('workflow_dispatch:')).toBe(true);
     expect(workflow.includes('refs/tags/v')).toBe(true);
     expect(workflow.includes('Create release tag')).toBe(true);
-    expect(workflow.includes('softprops/action-gh-release')).toBe(true);
+    expect(workflow.includes('gh release create')).toBe(true);
   });
 });
