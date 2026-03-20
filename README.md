@@ -13,6 +13,7 @@ Config-driven context sync for AI tools with a single source of truth.
 ## Features
 
 - `source.kind=canonical|tool` as single source
+- optional `memoryPath` sync for a single memory file such as `AGENTS.md` or `CLAUDE.md`
 - `link` and `copy` target modes
 - `init`, `sync`, `check`, `doctor` commands
 - `--dry-run` and `--force` conflict strategy
@@ -40,15 +41,18 @@ Create `context-sync.config.json`:
   "source": {
     "kind": "tool",
     "tool": "claude",
-    "skillsPath": ".claude/skills"
+    "skillsPath": ".claude/skills",
+    "memoryPath": "CLAUDE.md"
   },
   "targets": {
     "codex": {
       "skillsPath": ".agents/skills",
+      "memoryPath": "AGENTS.md",
       "mode": "link"
     },
     "cursor": {
       "skillsPath": ".cursor/skills",
+      "memoryPath": ".cursor/rules/project.mdc",
       "mode": "copy"
     }
   }
@@ -124,15 +128,21 @@ Recommended schema URL styles:
 
 - `canonical`: use an independent source directory as the only source.
 - `tool`: use a tool directory directly as the only source.
+- `memoryPath` is optional on both source and target. When configured on both sides, `sync/check/doctor` include that single file in addition to `skillsPath`.
 
 ### target mode
 
 - `link` mode:
-  - ensures target path is a symlink to source path
+  - ensures each configured target path is a symlink to the matching source path
   - `check` fails with `symlink mismatch` when link target is wrong
 - `copy` mode:
-  - copies source tree to target path
-  - `check` fails with `copy drift` when `modified/missing/extra` exists
+  - copies the configured source tree/file to the target path
+  - `check` fails with `copy drift` when `modified/missing/extra` exists for skills, or when the configured memory file differs
+
+### scope
+
+- current scope is `skillsPath` plus one optional `memoryPath`
+- directory-level `rules/` mapping is not part of the current release
 
 ### conflict strategy
 

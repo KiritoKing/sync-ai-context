@@ -127,6 +127,13 @@ function resolveDefaultSourcePath(sourceTool?: string): string {
   return `.${sourceTool}/skills`;
 }
 
+function resolveDefaultSourceMemoryPath(sourceTool?: string): string | undefined {
+  if (!sourceTool) {
+    return undefined;
+  }
+  return DEFAULT_TARGETS[sourceTool]?.memoryPath;
+}
+
 function buildTargets(
   selectedTargets: string[],
   modeStrategy: ModeStrategy,
@@ -222,6 +229,7 @@ function buildConfigFromAnswers(answers: InitAnswers): ConfigInput {
           kind: 'tool',
           tool: normalizeNonEmpty(answers.source.tool ?? '', 'source.tool'),
           skillsPath: answers.source.skillsPath,
+          memoryPath: resolveDefaultSourceMemoryPath(answers.source.tool),
         }
       : {
           kind: 'canonical',

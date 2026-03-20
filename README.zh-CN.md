@@ -6,11 +6,12 @@
 [![License](https://img.shields.io/github/license/KiritoKing/sync-ai-context.svg)](./LICENSE)
 [![Provenance](https://github.com/KiritoKing/sync-ai-context/actions/workflows/release.yml/badge.svg)](https://github.com/KiritoKing/sync-ai-context/actions/workflows/release.yml)
 
-面向 AI 工具规则与技能目录的配置驱动同步 CLI，支持单一源、多目标同步与一致性校验。
+面向 AI 工具上下文的配置驱动同步 CLI，支持单一源、多目标同步与一致性校验，当前范围为 `skills` 目录加一个可选的单文件记忆入口。
 
 ## 功能特性
 
 - 支持 `source.kind=canonical|tool` 单一来源
+- 支持可选 `memoryPath`，用于同步 `AGENTS.md`、`CLAUDE.md` 等单文件记忆上下文
 - 支持 `link` 与 `copy` 两种目标模式
 - 提供 `sync`、`check`、`doctor` 命令
 - 支持 `--dry-run` 与 `--force` 冲突策略
@@ -34,18 +35,22 @@ npx sync-ai-context sync --dry-run
 
 ```json
 {
+  "$schema": "https://raw.githubusercontent.com/bytedance/vibe-coder-manager/main/context-sync.schema.json",
   "source": {
     "kind": "tool",
     "tool": "claude",
-    "skillsPath": ".claude/skills"
+    "skillsPath": ".claude/skills",
+    "memoryPath": "CLAUDE.md"
   },
   "targets": {
     "codex": {
       "skillsPath": ".agents/skills",
+      "memoryPath": "AGENTS.md",
       "mode": "link"
     },
     "cursor": {
       "skillsPath": ".cursor/skills",
+      "memoryPath": ".cursor/rules/project.mdc",
       "mode": "copy"
     }
   }
@@ -86,15 +91,21 @@ context-sync doctor
 
 - `canonical`: 使用独立目录作为唯一来源
 - `tool`: 直接使用工具目录作为唯一来源
+- `memoryPath`: source 和 target 都配置时，`sync/check/doctor` 会额外处理该单个记忆文件
 
 ### target mode
 
 - `link` 模式：
-  - 目标目录应为指向源目录的符号链接
+  - 每个已配置目标路径都应为指向对应源路径的符号链接
   - `check` 发现目标不一致时返回 `symlink mismatch`
 - `copy` 模式：
-  - 将源目录内容复制到目标目录
-  - `check` 发现漂移时返回 `copy drift`（`modified/missing/extra`）
+  - 将已配置的源目录或单文件复制到目标路径
+  - `check` 发现漂移时返回 `copy drift`；目录报告 `modified/missing/extra`，单文件报告内容不一致
+
+### 当前范围
+
+- 当前版本支持 `skillsPath` 加一个可选的 `memoryPath`
+- 暂不支持目录级 `rules/` 映射或多文件规则分发
 
 ### 冲突策略
 

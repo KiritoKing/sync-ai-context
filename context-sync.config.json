@@ -3,7 +3,8 @@
   "source": {
     "kind": "tool",
     "tool": "codex",
-    "skillsPath": ".agents/skills"
+    "skillsPath": ".agents/skills",
+    "memoryPath": "AGENTS.md"
   },
   "targets": {
     "claude": {

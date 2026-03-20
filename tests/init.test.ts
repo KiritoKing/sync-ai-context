@@ -130,12 +130,14 @@ describe('init command', () => {
     );
     const config = JSON.parse(content) as {
       source: { kind: string };
-      targets: Record<string, { mode: string }>;
+      targets: Record<string, { mode: string; memoryPath?: string }>;
       $schema?: string;
     };
     expect(config.source.kind).toBe('canonical');
     expect(config.targets.codex.mode).toBe('link');
     expect(config.targets.cursor.mode).toBe('copy');
+    expect(config.targets.codex.memoryPath).toBe('AGENTS.md');
+    expect(config.targets.cursor.memoryPath).toBe('.cursor/rules/project.mdc');
     expect(config.$schema).toContain('context-sync.schema.json');
   });
 
@@ -165,12 +167,14 @@ describe('init command', () => {
     );
     const config = JSON.parse(content) as {
       source: { kind: string; tool?: string };
-      targets: Record<string, { mode: string }>;
+      targets: Record<string, { mode: string; memoryPath?: string }>;
     };
     expect(config.source.kind).toBe('tool');
     expect(config.source.tool).toBe('claude');
     expect(config.targets.codex.mode).toBe('copy');
     expect(config.targets.cline.mode).toBe('copy');
+    expect(config.targets.codex.memoryPath).toBe('AGENTS.md');
+    expect(config.targets.cline.memoryPath).toBe('.clinerules/project.md');
   });
 
   test('rejects overwriting existing config without confirmation', async () => {
@@ -252,5 +256,36 @@ describe('init command', () => {
     const merged = output.join('\n');
     expect(merged).toContain('symlink mismatch');
     expect(merged).toContain('copy drift');
+  });
+
+  test('tool source excludes self target but keeps target memory path presets', async () => {
+    const repoRoot = await createTempDir();
+    tempDirs.push(repoRoot);
+
+    const promptAdapter = new MockPromptAdapter({
+      select: ['tool', 'preset'],
+      multiSelect: [['claude', 'codex']],
+      input: ['claude', '.claude/skills', 'context-sync.config.json'],
+      confirm: [],
+    });
+
+    const code = await runCli(['init'], {
+      cwd: repoRoot,
+      promptAdapter,
+    });
+    expect(code).toBe(0);
+
+    const content = await readFile(
+      path.join(repoRoot, 'context-sync.config.json'),
+      'utf8',
+    );
+    const config = JSON.parse(content) as {
+      source: { kind: string; tool?: string };
+      targets: Record<string, { memoryPath?: string }>;
+    };
+
+    expect(config.source.tool).toBe('claude');
+    expect(config.targets.claude).toBeUndefined();
+    expect(config.targets.codex.memoryPath).toBe('AGENTS.md');
   });
 });

@@ -61,3 +61,15 @@ export async function createSymlink(
   const relative = path.relative(path.dirname(targetPath), sourcePath);
   await symlink(relative, targetPath, 'dir');
 }
+
+export async function createFileSymlink(
+  rootDir: string,
+  targetRel: string,
+  sourceRel: string,
+): Promise<void> {
+  const targetPath = path.join(rootDir, targetRel);
+  await mkdir(path.dirname(targetPath), { recursive: true });
+  const sourcePath = path.join(rootDir, sourceRel);
+  const relative = path.relative(path.dirname(targetPath), sourcePath);
+  await symlink(relative, targetPath, 'file');
+}

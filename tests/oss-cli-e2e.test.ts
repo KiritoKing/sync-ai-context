@@ -133,4 +133,55 @@ describe('cli e2e command coverage', () => {
     );
     expect(synced).toContain('Skill B');
   });
+
+  test('memoryPath config works across sync check and doctor commands', async () => {
+    const repoRoot = await createTempDir();
+    tempDirs.push(repoRoot);
+    await writeSkillsTree(repoRoot, '.aime/skills');
+    await writeTextFile(repoRoot, '.aime/AGENTS.md', '# Source Memory\n');
+    await writeTextFile(
+      repoRoot,
+      'context-sync.config.json',
+      JSON.stringify(
+        {
+          source: {
+            kind: 'canonical',
+            skillsPath: '.aime/skills',
+            memoryPath: '.aime/AGENTS.md',
+          },
+          targets: {
+            codex: {
+              skillsPath: '.agents/skills',
+              memoryPath: 'AGENTS.md',
+              mode: 'copy',
+            },
+          },
+        },
+        null,
+        2,
+      ),
+    );
+
+    const syncCode = await runCli(['sync'], { cwd: repoRoot });
+    const doctorMessages: string[] = [];
+    const doctorCode = await runCli(['doctor'], {
+      cwd: repoRoot,
+      stdout: (line) => doctorMessages.push(line),
+      stderr: (line) => doctorMessages.push(line),
+    });
+
+    await writeTextFile(repoRoot, 'AGENTS.md', '# Drifted\n');
+    const checkMessages: string[] = [];
+    const checkCode = await runCli(['check'], {
+      cwd: repoRoot,
+      stdout: (line) => checkMessages.push(line),
+      stderr: (line) => checkMessages.push(line),
+    });
+
+    expect(syncCode).toBe(0);
+    expect(doctorCode).toBe(0);
+    expect(checkCode).toBe(1);
+    expect(doctorMessages.join('\n')).toContain('AGENTS.md');
+    expect(checkMessages.join('\n')).toContain('AGENTS.md');
+  });
 });

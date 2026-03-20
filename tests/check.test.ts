@@ -2,6 +2,7 @@ import { afterEach, describe, expect, test } from '@rstest/core';
 import { checkContext, parseConfig, syncContext } from '../src/index';
 import {
   cleanupTempDir,
+  createFileSymlink,
   createSymlink,
   createTempDir,
   writeSkillsTree,
@@ -57,5 +58,68 @@ describe('checkContext', () => {
     const result = await checkContext({ config });
     expect(result.success).toBe(false);
     expect(result.errors[0]).toContain('modified');
+  });
+
+  test('detects memory file drift in copy mode', async () => {
+    const repoRoot = await createTempDir();
+    tempDirs.push(repoRoot);
+    await writeSkillsTree(repoRoot, '.aime/skills');
+    await writeTextFile(repoRoot, '.aime/AGENTS.md', '# Source Memory\n');
+    const config = parseConfig(
+      {
+        source: {
+          kind: 'canonical',
+          skillsPath: '.aime/skills',
+          memoryPath: '.aime/AGENTS.md',
+        },
+        targets: {
+          codex: {
+            skillsPath: '.agents/skills',
+            memoryPath: 'AGENTS.md',
+            mode: 'copy',
+          },
+        },
+      },
+      repoRoot,
+    );
+    await syncContext({ config });
+
+    await writeTextFile(repoRoot, 'AGENTS.md', 'drift');
+    const result = await checkContext({ config });
+    expect(result.success).toBe(false);
+    expect(result.errors.join('\n')).toContain('AGENTS.md');
+  });
+
+  test('detects memory file symlink mismatch in link mode', async () => {
+    const repoRoot = await createTempDir();
+    tempDirs.push(repoRoot);
+    await writeSkillsTree(repoRoot, '.aime/skills');
+    await writeTextFile(repoRoot, '.aime/AGENTS.md', '# Source Memory\n');
+    await writeTextFile(repoRoot, '.other/AGENTS.md', '# Other Memory\n');
+    await createSymlink(repoRoot, '.agents/skills', '.aime/skills');
+    await createFileSymlink(repoRoot, 'AGENTS.md', '.other/AGENTS.md');
+
+    const config = parseConfig(
+      {
+        source: {
+          kind: 'canonical',
+          skillsPath: '.aime/skills',
+          memoryPath: '.aime/AGENTS.md',
+        },
+        targets: {
+          codex: {
+            skillsPath: '.agents/skills',
+            memoryPath: 'AGENTS.md',
+            mode: 'link',
+          },
+        },
+      },
+      repoRoot,
+    );
+
+    const result = await checkContext({ config });
+    expect(result.success).toBe(false);
+    expect(result.errors.join('\n')).toContain('AGENTS.md');
+    expect(result.errors.join('\n')).toContain('symlink mismatch');
   });
 });

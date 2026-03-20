@@ -75,13 +75,14 @@ export async function replaceWithCopy(
 }
 
 export async function replaceWithLink(
-  sourceDir: string,
-  targetDir: string,
+  sourcePath: string,
+  targetPath: string,
+  linkType: 'dir' | 'file',
 ): Promise<void> {
-  await rm(targetDir, { recursive: true, force: true });
-  await ensureParentDir(targetDir);
-  const relative = path.relative(path.dirname(targetDir), sourceDir);
-  await fsSync.promises.symlink(relative, targetDir, 'dir');
+  await rm(targetPath, { recursive: true, force: true });
+  await ensureParentDir(targetPath);
+  const relative = path.relative(path.dirname(targetPath), sourcePath);
+  await fsSync.promises.symlink(relative, targetPath, linkType);
 }
 
 export function diffHashMaps(
