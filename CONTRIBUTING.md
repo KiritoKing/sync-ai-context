@@ -11,6 +11,20 @@
 pnpm install
 ```
 
+## OpenSpec Workflow
+
+- Install the official OpenSpec CLI with Node.js `>=20.19.0`.
+- Bootstrap or refresh the repo workflow with:
+
+```bash
+npx @fission-ai/openspec@latest init --tools codex
+npx @fission-ai/openspec@latest update
+```
+
+- Package: `@fission-ai/openspec`
+- Codex project skills are committed in `.codex/skills/`.
+- Codex global prompts and commands are managed by the official OpenSpec CLI outside this repo, so run `openspec update` after upgrading the CLI.
+
 ## Development Workflow
 
 1. Create a feature branch.

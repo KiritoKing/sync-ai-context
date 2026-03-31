@@ -1,5 +1,10 @@
 schema: spec-driven
 context: |
+  语言：中文（简体）
+  所有产出物必须用简体中文撰写。
+  技术术语如 API、REST、GraphQL、OpenSpec 在更清晰时保留英文。
+  代码示例、文件路径、命令名、schema ID 保持英文。
+
   技术栈：TypeScript + Node.js，使用 Rslib 构建，Rstest 测试框架。
   包管理器：pnpm。
   Node.js 工具命令约定：使用 npx 前缀执行（例如 npx tsc、npx eslint）。
