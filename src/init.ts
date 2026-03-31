@@ -127,7 +127,9 @@ function resolveDefaultSourcePath(sourceTool?: string): string {
   return `.${sourceTool}/skills`;
 }
 
-function resolveDefaultSourceMemoryPath(sourceTool?: string): string | undefined {
+function resolveDefaultSourceMemoryPath(
+  sourceTool?: string,
+): string | undefined {
   if (!sourceTool) {
     return undefined;
   }

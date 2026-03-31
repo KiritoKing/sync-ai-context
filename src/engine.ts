@@ -116,7 +116,9 @@ async function syncCopy(
         hashFile(targetPath),
       ]);
       if (sourceHash !== targetHash) {
-        errors.push(`copy conflict: target file has local changes (${targetPath})`);
+        errors.push(
+          `copy conflict: target file has local changes (${targetPath})`,
+        );
         return { actions, errors };
       }
     }
@@ -195,7 +197,9 @@ export async function syncContext(
         errors.push(`source path not found: ${artifact.sourcePath}`);
         continue;
       }
-      if (path.resolve(artifact.targetPath) === path.resolve(artifact.sourcePath)) {
+      if (
+        path.resolve(artifact.targetPath) === path.resolve(artifact.sourcePath)
+      ) {
         actions.push(`skip ${name}: ${artifact.label} target equals source`);
         continue;
       }
@@ -275,7 +279,9 @@ export async function checkContext(
       } else {
         const stat = await lstat(targetPath);
         if (!stat.isFile()) {
-          errors.push(`copy drift: ${name} (${targetPath}); target is not a file`);
+          errors.push(
+            `copy drift: ${name} (${targetPath}); target is not a file`,
+          );
           continue;
         }
         const [sourceHash, targetHash] = await Promise.all([
@@ -283,7 +289,9 @@ export async function checkContext(
           hashFile(targetPath),
         ]);
         if (sourceHash !== targetHash) {
-          errors.push(`copy drift: ${name} (${targetPath}); modified: 1 (${path.basename(targetPath)})`);
+          errors.push(
+            `copy drift: ${name} (${targetPath}); modified: 1 (${path.basename(targetPath)})`,
+          );
           continue;
         }
       }
