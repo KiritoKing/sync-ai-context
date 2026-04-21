@@ -65,7 +65,8 @@ describe('release automation workflow', () => {
     expect(workflow.includes('jobs:')).toBe(true);
     expect(workflow.includes('verify:')).toBe(true);
     expect(workflow.includes('publish:')).toBe(true);
-    expect(workflow.includes('needs: verify')).toBe(true);
+    expect(workflow.includes('needs:')).toBe(true);
+    expect(workflow.includes('- verify')).toBe(true);
     expect(workflow.includes('pnpm run test')).toBe(true);
     expect(workflow.includes('pnpm run build')).toBe(true);
     expect(workflow.includes('pnpm publish --provenance --access public')).toBe(
@@ -73,13 +74,16 @@ describe('release automation workflow', () => {
     );
   });
 
-  test('release workflow includes tag and github release steps', async () => {
+  test('release workflow includes automatic branch release and github release steps', async () => {
     const workflow = await readFile(
       path.join(getRepoRoot(), '.github/workflows/release.yml'),
       'utf8',
     );
+    expect(workflow.includes('branches:')).toBe(true);
+    expect(workflow.includes('- master')).toBe(true);
+    expect(workflow.includes('- main')).toBe(true);
     expect(workflow.includes('workflow_dispatch:')).toBe(true);
-    expect(workflow.includes('refs/tags/v')).toBe(true);
+    expect(workflow.includes("--sort=-v:refname")).toBe(true);
     expect(workflow.includes('Create release tag')).toBe(true);
     expect(workflow.includes('gh release create')).toBe(true);
   });
